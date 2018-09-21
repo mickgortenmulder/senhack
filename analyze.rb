@@ -29,7 +29,8 @@ class MoodAnalyzer
 
       converted_hash[name][:link] = video["VideoUrl"]
       # converted_hash[name][:input] = video["CommentList"].first(5)
-      converted_hash[name][:mood] = emotion(video["CommentList"].first(5))
+      emotion = emotion(video["CommentList"].first(5).join(","))
+      converted_hash[name][:mood] = emotion["emotion"]["emotion"]
       # converted_hash[name][:mood] = "test"
     end
 
@@ -42,7 +43,7 @@ class MoodAnalyzer
     mood_hash.each do |video_name,video_info|
       puts video_name
       puts video_info
-      @client.index index: 'mood-analyzer', type: 'my-video-mood', body: { title: video_name, link: video_info[:link], mood: video_info[:mood] }
+      # @client.index index: 'mood-analyzer', type: 'my-video-mood', body: { title: video_name, link: video_info[:link], mood: video_info[:mood] }
     end
   end
 end
