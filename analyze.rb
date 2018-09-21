@@ -6,10 +6,6 @@ require 'json'
 class MoodAnalyzer
   def initialize
     @client = Elasticsearch::Client.new log: true
-    @videos = { "Video1" => { :link => "https://google.com", :comments => ["i am happy","i am not happy","i am rather content so yeah"] },
-               "Video2" => { :link => "https://reddit.com", :comments => ["i am happy","i am not happy","i am rather content so yeah"] },
-               "Video3" => { :link => "https://twitter.com", :comments => ["i am happy","i am not happy","i am rather content so yeah"] }
-             }
     file = File.read('input.json')
     videos = JSON.parse(file)
     @videos2 = videos["value"][0..2]
@@ -19,7 +15,7 @@ class MoodAnalyzer
     converted_hash = Hash.new { |hash,key| hash[key] = Hash.new }
 
     @videos2.each do |video|
-      name = video["Description"]
+      name = video["Title"]
 
       # print
       # ap "New video available: #{name}"
@@ -29,6 +25,7 @@ class MoodAnalyzer
       # end
       # ap emotion(comment)
 
+      converted_hash[name][:description] = video["Description"]
       converted_hash[name][:link] = video["VideoUrl"]
       converted_hash[name][:input] = video["CommentList"][0..9]
       # hash[name][:mood] = emotion(subhash[:comments].join(","))
@@ -45,7 +42,7 @@ class MoodAnalyzer
     mood_hash.each do |video_name,video_info|
       puts video_name
       puts video_info
-      # @client.index index: 'mood-analyzer', type: 'my-video-mood', id: 1, body: { title: video_name, info: video_info }
+      @client.index index: 'mood-analyzer', type: 'my-video-mood', id: 1, body: { title: video_name, info: video_info }
     end
   end
 end
